@@ -1,0 +1,34 @@
+// up and running with
+---------------------------------------------
+1. npm init
+2. npm install webpack webpack-dev-server -D
+3. webpack.config with context and src defined
+4. link your html file to bundle.js
+5  run server: node_modules/.bin/webpack-dev-server
+6. optional: use the 'npm start' to start up the server
+7. optional: set the --content-base flag for setting the server base folder
+
+// bring in ES6
+---------------------------------------------
+1. npm install babel-loader -D
+2. webpack.config: add loader to module.loaders array
+3. webpack.config: devtool: "#inline-source-map"
+
+// going Angular
+---------------------------------------------
+1. npm install angular --save
+2. npm install angular-ui-router --save
+3. import angular and ui-router in our "app,js"
+4. bootstrap angular in your app.js
+
+// using css
+---------------------------------------------
+1. npm install style-loader & css-loader
+2. add the loaders to the config file
+3. npm install less-loader
+4. add the loaders to the config file
+
+// loading JSON
+---------------------------------------------
+1. npm install json-loader --save
+2. add the loaders to the config file
