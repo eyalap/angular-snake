@@ -7,14 +7,19 @@ function navbar() {
   return {
     restrict: 'E',
     template: require('navbar/navbar.html'),
-    controller: NavbarController
+    controller: NavbarController,
+    controllerAs: 'navbar'
   }
 }
 
 class NavbarController {
 
-  constructor() {
+  constructor($scope) {
+    this.scope = $scope;
+  }
 
+  startGame() {
+    this.scope.$broadcast('game:start');
   }
 
 }

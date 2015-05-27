@@ -1,3 +1,5 @@
+import 'snake/snake.less';
+
 export default angular.module('snake', [])
   .directive('snakeGame', snakeGame);
 
@@ -12,7 +14,8 @@ function snakeGame() {
 
 class snakeGameController {
 
-  constructor($element, $interval, $window) {
+  constructor($element, $interval, $window, $scope) {
+    this.scope = $scope;
     this.keys = [];
     this.$window = $window;
     this.$interval = $interval;
@@ -23,12 +26,14 @@ class snakeGameController {
     this.cw = 10;
     this.d = null;
     this.food = null;
-    this.score = null;
+    this.score = 0;
     this.game_loop = undefined;
     this.snake_array = [];
 
     this._drawCanvas();
     this._registerListeners();
+
+    this.scope.$on('game:start', this._init.bind(this));
   }
 
   start() {
@@ -70,7 +75,6 @@ class snakeGameController {
     this.d = "right";
     this.snake_array = this.create_snake();
     this.food = this.create_food();
-    this.score = 0;
 
     if (typeof this.game_loop != "undefined") clearInterval(this.game_loop);
     this.game_loop = this.$interval(this.paint.bind(this), 60);
@@ -125,7 +129,8 @@ class snakeGameController {
         x: nx,
         y: ny
       };
-      this.score++;
+
+      this.score += 1;
       this.food = this.create_food();
     }
     else {
@@ -141,9 +146,6 @@ class snakeGameController {
     }
 
     this.paint_cell(this.food.x, this.food.y);
-    let score_text = "Score: " + this.score;
-
-    this.ctx.fillText(score_text, 5, this.h - 5);
   }
 
   paint_cell(x, y) {
