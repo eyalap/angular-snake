@@ -17,9 +17,8 @@
 // going Angular
 ---------------------------------------------
 1. npm install angular --save
-2. npm install angular-ui-router --save
-3. import angular and ui-router in our "app,js"
-4. bootstrap angular in your app.js
+2. import angular and ui-router in our "app,js"
+3. bootstrap angular in your app.js
 
 // using css
 ---------------------------------------------
