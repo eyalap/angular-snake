@@ -1,4 +1,5 @@
 import 'snake/snake.less';
+import config from 'snake/config.json';
 
 export default angular.module('snake', [])
   .directive('snakeGame', snakeGame);
@@ -8,7 +9,7 @@ function snakeGame() {
     restrict: 'E',
     controller: snakeGameController,
     controllerAs: 'game',
-    templateUrl: 'snake/snake.html'
+    template: require('snake/snake.html')
   }
 }
 
@@ -73,6 +74,7 @@ class snakeGameController {
 
   _init() {
     this.d = "right";
+    this.score = 0;
     this.snake_array = this.create_snake();
     this.food = this.create_food();
 
@@ -81,7 +83,7 @@ class snakeGameController {
   }
 
   create_snake() {
-    let length = 5; //Length of the snake
+    let length = config.snake_length; //Length of the snake
     let snake_array = [];
 
     while (length) {
@@ -119,7 +121,10 @@ class snakeGameController {
     else if (this.d == "down") ny++;
 
     if (nx == -1 || nx == this.w / this.cw || ny == -1 || ny == this.h / this.cw || this.check_collision(nx, ny, this.snake_array)) {
-      return this.$interval.cancel(this.game_loop);
+      this.$interval.cancel(this.game_loop);
+      let input = this.$window.prompt("Game Over! Your score: "+ this.score+ ". type your name:");
+      this.scope.$broadcast('game:over', {player: input, score: this.score});
+      return
     }
 
     let tail;
@@ -149,9 +154,9 @@ class snakeGameController {
   }
 
   paint_cell(x, y) {
-    this.ctx.fillStyle = "blue";
+    this.ctx.fillStyle = config.snake_color;
     this.ctx.fillRect(x * this.cw, y * this.cw, this.cw, this.cw);
-    this.ctx.strokeStyle = "white";
+    this.ctx.strokeStyle = config.snake_border;
     this.ctx.strokeRect(x * this.cw, y * this.cw, this.cw, this.cw);
   }
 
@@ -162,3 +167,5 @@ class snakeGameController {
     return false;
   }
 }
+
+snakeGameController.$inject=['$element', '$interval', '$window', '$scope'];

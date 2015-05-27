@@ -24,4 +24,4 @@ class NavbarController {
 
 }
 
-
+NavbarController.$inject=['$scope'];
