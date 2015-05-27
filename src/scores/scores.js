@@ -4,7 +4,7 @@ export default angular.module('scores', [])
 function scores () {
   return {
     restrict: 'E',
-    templateUrl: 'scores/scores.html',
+    template: require('scores/scores.html'),
     controller: ScoresController
   }
 }

@@ -10,7 +10,7 @@ angular.module('app', [navbar.name, snake.name, scores.name])
 
   // register the app directive
   .directive('app', () => {
-    return {templateUrl: 'app/app.html'}
+    return {template: require('app/app.html')}
   });
 
 // kick angular!

@@ -12,13 +12,16 @@ module.exports = {
 
   module: {
     loaders: [
-      { test: /\.js$/, exclude: /node_modules/, loader:"babel-loader" },
-      { test: /\.less$/, loader: "style-loader!css-loader!less-loader"},
-      { test: /\.json$/, loader: "json-loader" },
+      { test: /\.js$/, exclude: /node_modules/, loader:"babel" },
+      { test: /\.less$/, loader: "style!css!less"},
+      { test: /\.json$/, loader: "json" },
+
+      // load raw html files
+      { test: /\.html$/, exclude: /node_modules/, loader:"raw" },
 
       // load fonts and images
-      { test: /\.(ttf|eot|svg|otf)$/, loader: "file-loader" },
-      { test: /\.woff(2)?$/, loader: "url-loader?limit=10000&minetype=application/font-woff"}
+      { test: /\.(ttf|eot|svg|otf)$/, loader: "file" },
+      { test: /\.woff(2)?$/, loader: "url?limit=10000&minetype=application/font-woff"}
     ]
   },
 
