@@ -1,57 +1,84 @@
 export default angular.module('snake', [])
   .directive('snakeGame', snakeGame);
 
-function snakeGameController ($element) {
-  var keys = [];
-  window.addEventListener("keydown",
-    function(e){
-      keys[e.keyCode] = true;
-      switch(e.keyCode){
-        case 37: case 39: case 38:  case 40: // Arrow keys
-        case 32: e.preventDefault(); break; // Space
-        default: break; // do not block other keys
-      }
-    },
-    false);
+function snakeGame() {
+  return {
+    restrict: 'E',
+    controller: snakeGameController,
+    controllerAs: 'game',
+    templateUrl: 'snake/snake.html'
+  }
+}
 
-  window.addEventListener('keyup',
-    function(e){
-      keys[e.keyCode] = false;
-    },
-    false);
+class snakeGameController {
 
-  var canvas = $element.find("canvas")[0];
-  var ctx = canvas.getContext("2d");
-  var w = canvas.width;
-  var h = canvas.height;
+  constructor($element, $interval, $window) {
+    this.keys = [];
+    this.$window = $window;
+    this.$interval = $interval;
+    this.canvas = $element.find("canvas")[0];
+    this.ctx = this.canvas.getContext("2d");
+    this.w = this.canvas.width;
+    this.h = this.canvas.height;
+    this.cw = 10;
+    this.d = null;
+    this.food = null;
+    this.score = null;
+    this.game_loop = undefined;
+    this.snake_array = [];
 
-  //Lets save the cell width in a variable for easy control
-  var cw = 10;
-  var d;
-  var food;
-  var score;
-  var game_loop = undefined;
-
-  //Lets create the snake now
-  var snake_array;
-
-  function init() {
-    d = "right"; //default direction
-    snake_array = create_snake();
-    food = create_food(); //Now we can see the food particle
-    //finally lets display the score
-    score = 0;
-
-    //Lets move the snake now using a timer which will trigger the paint function
-    if (typeof game_loop != "undefined") clearInterval(game_loop);
-    game_loop = setInterval(paint, 60);
+    this._drawCanvas();
+    this._registerListeners();
   }
 
-  init()
+  start() {
+    this._init();
+  }
 
-  function create_snake() {
-    var length = 5; //Length of the snake
-    var snake_array = [];
+  _registerListeners() {
+
+    this.$window.addEventListener("keydown", (e) => {
+      this.keys[e.keyCode] = true;
+      switch (e.keyCode) {
+        case 37:
+        case 39:
+        case 38:
+        case 40:
+        case 32:
+          e.preventDefault();
+          break;
+        default:
+          break;
+      }
+    }, false);
+
+    this.$window.addEventListener('keyup', (e) => {
+        this.keys[e.keyCode] = false;
+      }, false);
+
+    this.$window.document.addEventListener('keydown',  (e) => {
+      let key = e.which;
+
+      if (key == "37" && this.d != "right") this.d = "left";
+      else if (key == "38" && this.d != "down") this.d = "up";
+      else if (key == "39" && this.d != "left") this.d = "right";
+      else if (key == "40" && this.d != "up") this.d = "down";
+    })
+  }
+
+  _init() {
+    this.d = "right";
+    this.snake_array = this.create_snake();
+    this.food = this.create_food();
+    this.score = 0;
+
+    if (typeof this.game_loop != "undefined") clearInterval(this.game_loop);
+    this.game_loop = this.$interval(this.paint.bind(this), 60);
+  }
+
+  create_snake() {
+    let length = 5; //Length of the snake
+    let snake_array = [];
 
     while (length) {
       snake_array.push({
@@ -59,122 +86,77 @@ function snakeGameController ($element) {
         y: 0
       });
     }
-
     return snake_array;
   }
 
-
-  //$element.find('button').click(init);
-
-  /**
-   * This will create a cell with x/y between 0-44
-   * Because there are 45(450/10) positions across the rows and columns
-   */
-  function create_food() {
-    return  {
-      x: Math.round(Math.random() * (w - cw) / cw),
-      y: Math.round(Math.random() * (h - cw) / cw)
+  create_food() {
+    return {
+      x: Math.round(Math.random() * (this.w - this.cw) / this.cw),
+      y: Math.round(Math.random() * (this.h - this.cw) / this.cw)
     };
   }
 
+  _drawCanvas() {
+    this.ctx.fillStyle = "white";
+    this.ctx.fillRect(0, 0, this.w, this.h);
+    this.ctx.strokeStyle = "black";
+    this.ctx.strokeRect(0, 0, this.w, this.h);
+  }
 
-  /**
-   * To avoid the snake trail we need to paint the BG on every frame
-   * Lets paint the canvas now
-   */
-  function paint() {
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, w, h);
-    ctx.strokeStyle = "black";
-    ctx.strokeRect(0, 0, w, h);
+  paint() {
+    this._drawCanvas();
 
-    //The movement code for the snake to come here.
-    //The logic is simple
-    //Pop out the tail cell and place it in front of the head cell
-    var nx = snake_array[0].x;
-    var ny = snake_array[0].y;
+    let nx = this.snake_array[0].x;
+    let ny = this.snake_array[0].y;
 
-    //These were the position of the head cell.
-    //We will increment it to get the new head position
-    //Lets add proper direction based movement now
-    if (d == "right") nx++;
-    else if (d == "left") nx--;
-    else if (d == "up") ny--;
-    else if (d == "down") ny++;
+    if (this.d == "right") nx++;
+    else if (this.d == "left") nx--;
+    else if (this.d == "up") ny--;
+    else if (this.d == "down") ny++;
 
-    //Lets add the game over clauses now
-    //This will restart the game if the snake hits the wall
-    //Lets add the code for body collision
-    //Now if the head of the snake bumps into its body, the game will restart
-    if (nx == -1 || nx == w / cw || ny == -1 || ny == h / cw || check_collision(nx, ny, snake_array)) {
-      window.alert("Game Over!");
-      return clearInterval(game_loop)
+    if (nx == -1 || nx == this.w / this.cw || ny == -1 || ny == this.h / this.cw || this.check_collision(nx, ny, this.snake_array)) {
+      return this.$interval.cancel(this.game_loop);
     }
 
-    //code to make the snake eat the food
-    if (nx == food.x && ny == food.y) {
-      var tail;
+    let tail;
+    if (nx == this.food.x && ny == this.food.y) {
+
       tail = {
         x: nx,
         y: ny
       };
-      score++;
-      //Create new food
-      food = create_food();
+      this.score++;
+      this.food = this.create_food();
     }
     else {
-      tail = snake_array.pop(); //pops out the last cell
+      tail = this.snake_array.pop();
       tail.x = nx;
       tail.y = ny;
     }
-    //The snake can now eat the food.
-    snake_array.unshift(tail); //puts back the tail as the first cell
-    for (var i = 0; i < snake_array.length; i++) {
-      var c = snake_array[i];
-      //Lets paint 10px wide cells
-      paint_cell(c.x, c.y);
+
+    this.snake_array.unshift(tail);
+    for (let i = 0; i < this.snake_array.length; i++) {
+      let c = this.snake_array[i];
+      this.paint_cell(c.x, c.y);
     }
 
-    //Lets paint the food
-    paint_cell(food.x, food.y);
-    //Lets paint the score
-    var score_text = "Score: " + score;
-    ctx.fillText(score_text, 5, h - 5);
+    this.paint_cell(this.food.x, this.food.y);
+    let score_text = "Score: " + this.score;
+
+    this.ctx.fillText(score_text, 5, this.h - 5);
   }
 
-  //Lets first create a generic function to paint cells
-  function paint_cell(x, y) {
-    ctx.fillStyle = "blue";
-    ctx.fillRect(x * cw, y * cw, cw, cw);
-    ctx.strokeStyle = "white";
-    ctx.strokeRect(x * cw, y * cw, cw, cw);
+  paint_cell(x, y) {
+    this.ctx.fillStyle = "blue";
+    this.ctx.fillRect(x * this.cw, y * this.cw, this.cw, this.cw);
+    this.ctx.strokeStyle = "white";
+    this.ctx.strokeRect(x * this.cw, y * this.cw, this.cw, this.cw);
   }
 
-  function check_collision(x, y, array) {
-    for (var i = 0; i < array.length; i++) {
+  check_collision(x, y, array) {
+    for (let i = 0; i < array.length; i++) {
       if (array[i].x == x && array[i].y == y) return true;
     }
     return false;
   }
-
-  //Lets add the keyboard controls now
-  document.addEventListener('keydown',function(e) {
-    var key = e.which;
-    //We will add another clause to prevent reverse gear
-    if (key == "37" && d != "right") d = "left";
-    else if (key == "38" && d != "down") d = "up";
-    else if (key == "39" && d != "left") d = "right";
-    else if (key == "40" && d != "up") d = "down";
-    //The snake is now keyboard controllable
-  })
 }
-
-function snakeGame () {
-  return {
-    restrict: 'E',
-    controller: snakeGameController,
-    templateUrl: 'snake/snake.html'
-  }
-}
-
-
