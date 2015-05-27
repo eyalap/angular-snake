@@ -1,5 +1,5 @@
 {
   "snake_length": 5,
-  "snake_color" : "blue",
+  "snake_color" : "red",
   "snake_border": "white"
 }

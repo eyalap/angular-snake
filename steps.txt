@@ -2,7 +2,7 @@
 ---------------------------------------------
 1. npm init
 2. npm install webpack webpack-dev-server -D
-3. webpack.config with context and src defined
+3. webpack.config with context and src defined "context: __dirname + '/src', entry: './app/app.js',"
 4. link your html file to bundle.js
 5  run server: node_modules/.bin/webpack-dev-server
 6. optional: use the 'npm start' to start up the server
@@ -17,7 +17,7 @@
 // going Angular
 ---------------------------------------------
 1. npm install angular --save
-2. import angular and ui-router in our "app,js"
+2. import angular in your "app,js"
 3. bootstrap angular in your app.js
 
 // using css

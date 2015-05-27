@@ -27,5 +27,4 @@ module.exports = {
 
   // support source maps
   devtool: "#inline-source-map"
-
 };
