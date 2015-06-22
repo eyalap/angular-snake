@@ -22,8 +22,6 @@ class ScoresController {
     $scope.$on('game:over', this._updateScore.bind(this));
   }
 
-
-
   _updateScore(evt, payload) {
     if(payload.player) {
       this.scores.push({
@@ -33,7 +31,6 @@ class ScoresController {
     }
 
     this.storage.setItem('SCORES', this.scores);
-
   }
 }
 
