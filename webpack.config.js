@@ -7,7 +7,7 @@ module.exports = {
 
   // enable loading modules relatively
   resolve: {
-    root: [__dirname + "/src"]
+    root: [__dirname.replace(/\\/g, "/") + "/src"]
   },
 
   module: {
